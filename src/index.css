@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #2D3FE7;
+  --color-background: #F5F7FF;
+  --color-card: #FFFFFF;
+  --color-text: #1F2937;
+  --color-border: #E5E7EB;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.animate-sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
