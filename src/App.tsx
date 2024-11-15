@@ -15,11 +15,15 @@ import { Services } from './components/Services';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Search } from 'lucide-react';
 import { SearchDialog } from './components/Search/SearchDialog';
+import { PermissionGuard } from './components/PermissionGuard';
+import { useAuthStore } from './store/auth';
+import { Login } from './components/Login';
 
 const App: React.FC = () => {
   const [activeSection, setActiveSection] = React.useState('dashboard');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [isSearchDialogOpen, setIsSearchDialogOpen] = React.useState(false);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,49 +32,61 @@ const App: React.FC = () => {
     }
   };
 
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
   const renderContent = () => {
     if (activeSection.startsWith('hr/')) {
-      return <HR section={activeSection} />;
+      return (
+        <PermissionGuard module="hr" action="view">
+          <HR section={activeSection} />
+        </PermissionGuard>
+      );
     }
 
     if (activeSection.startsWith('finance/')) {
-      return <Finance section={activeSection} />;
+      return (
+        <PermissionGuard module="finance" action="view">
+          <Finance section={activeSection} />
+        </PermissionGuard>
+      );
     }
 
     if (activeSection.startsWith('marketing/')) {
-      return <Marketing section={activeSection} />;
+      return (
+        <PermissionGuard module="marketing" action="view">
+          <Marketing section={activeSection} />
+        </PermissionGuard>
+      );
     }
 
     if (activeSection.startsWith('services/')) {
       const [, service, subsection] = activeSection.split('/');
-      return <Services section={service} subsection={subsection} />;
+      return (
+        <PermissionGuard module="services" action="view">
+          <Services section={service} subsection={subsection} />
+        </PermissionGuard>
+      );
     }
 
-    switch (activeSection) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'events':
-        return <Events />;
-      case 'tasks':
-        return <TodoList />;
-      case 'contacts':
-        return <Contacts />;
-      case 'tickets':
-        return <Tickets />;
-      case 'documents':
-        return <Documents />;
-      case 'chat':
-        return <Chat />;
-      case 'settings':
-        return <Settings />;
-      default:
-        return (
-          <div className="text-center mt-20">
-            <h2 className="text-2xl font-semibold text-text">Coming Soon</h2>
-            <p className="mt-2 text-gray-600">This section is under development.</p>
-          </div>
-        );
-    }
+    const components = {
+      dashboard: <PermissionGuard module="dashboard" action="view"><Dashboard /></PermissionGuard>,
+      events: <PermissionGuard module="dashboard" action="view"><Events /></PermissionGuard>,
+      tasks: <PermissionGuard module="tasks" action="view"><TodoList /></PermissionGuard>,
+      contacts: <PermissionGuard module="contacts" action="view"><Contacts /></PermissionGuard>,
+      tickets: <PermissionGuard module="tickets" action="view"><Tickets /></PermissionGuard>,
+      documents: <PermissionGuard module="documents" action="view"><Documents /></PermissionGuard>,
+      chat: <PermissionGuard module="chat" action="view"><Chat /></PermissionGuard>,
+      settings: <PermissionGuard module="settings" action="view"><Settings /></PermissionGuard>,
+    };
+
+    return components[activeSection as keyof typeof components] || (
+      <div className="text-center mt-20">
+        <h2 className="text-2xl font-semibold text-text">Coming Soon</h2>
+        <p className="mt-2 text-gray-600">This section is under development.</p>
+      </div>
+    );
   };
 
   return (
