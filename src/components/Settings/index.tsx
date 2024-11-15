@@ -3,6 +3,9 @@ import { ThemeSelector } from './ThemeSelector';
 import { APIConnector } from './APIConnector';
 import { WorkflowBuilder } from './WorkflowBuilder';
 import { DatabasePanel } from './DatabasePanel';
+import { UserPermissions } from './UserPermissions';
+import { NotificationsPanel } from './NotificationsPanel';
+import { WebhookSettings } from './WebhookSettings';
 import { 
   Palette, 
   Link, 
@@ -11,8 +14,11 @@ import {
   Users, 
   Globe,
   Database,
-  Workflow
+  Workflow,
+  Lock,
+  Webhook
 } from 'lucide-react';
+import { PermissionGuard } from '../PermissionGuard';
 import clsx from 'clsx';
 
 type SettingsSection = 
@@ -23,6 +29,8 @@ type SettingsSection =
   | 'security' 
   | 'notifications' 
   | 'users' 
+  | 'permissions'
+  | 'webhooks'
   | 'general';
 
 export const Settings = () => {
@@ -33,9 +41,11 @@ export const Settings = () => {
     { id: 'database', label: 'Database', icon: Database },
     { id: 'integrations', label: 'API Integrations', icon: Link },
     { id: 'workflows', label: 'Workflow Builder', icon: Workflow },
+    { id: 'webhooks', label: 'Webhooks', icon: Webhook },
     { id: 'security', label: 'Security', icon: Shield },
     { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'users', label: 'Users & Permissions', icon: Users },
+    { id: 'permissions', label: 'Role Permissions', icon: Lock },
     { id: 'general', label: 'General', icon: Globe },
   ] as const;
 
@@ -49,6 +59,25 @@ export const Settings = () => {
         return <APIConnector />;
       case 'workflows':
         return <WorkflowBuilder />;
+      case 'webhooks':
+        return <WebhookSettings />;
+      case 'notifications':
+        return <NotificationsPanel />;
+      case 'permissions':
+        return (
+          <PermissionGuard 
+            module="settings" 
+            action="edit"
+            fallback={
+              <div className="text-center py-12">
+                <h3 className="text-lg font-medium text-gray-900">Access Denied</h3>
+                <p className="mt-2 text-sm text-gray-500">You don't have permission to manage user roles.</p>
+              </div>
+            }
+          >
+            <UserPermissions />
+          </PermissionGuard>
+        );
       default:
         return (
           <div className="text-center py-12">
@@ -61,7 +90,6 @@ export const Settings = () => {
 
   return (
     <div className="flex gap-4">
-      {/* Inner Sidebar */}
       <div className="w-64 bg-card rounded-lg shadow-sm border border-border p-4">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Settings</h2>
         <nav className="space-y-1">
@@ -83,7 +111,6 @@ export const Settings = () => {
         </nav>
       </div>
 
-      {/* Content Area */}
       <div className="flex-1">
         <div className="bg-card rounded-lg shadow-sm border border-border p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">
