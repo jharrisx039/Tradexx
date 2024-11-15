@@ -32,65 +32,34 @@ interface ChatStore {
   toggleMessageSelection: (chatId: string, messageId: string) => void;
   clearSelectedMessages: () => void;
   markAsRead: (chatId: string) => void;
-  addChat: (chat: Omit<Chat, 'id' | 'messages' | 'unreadCount' | 'status'>) => void;
-  resolveChat: (chatId: string) => void;
 }
 
-export const useChatStore = create<ChatStore>((set) => ({
-  chats: [
-    {
+export const useChatStore = create<ChatStore>((set, get) => ({
+  chats: [{
+    id: '1',
+    customer: {
       id: '1',
-      customer: {
-        id: '1',
-        name: 'John Doe',
-        platform: 'web'
-      },
-      messages: [
-        {
-          id: '1',
-          text: 'Hello! How can I help you today?',
-          sender: 'agent',
-          timestamp: new Date().toISOString(),
-          type: 'agent'
-        }
-      ],
-      unreadCount: 0,
-      status: 'active'
+      name: 'John Doe',
+      platform: 'web'
     },
-    {
-      id: '2',
-      customer: {
-        id: '2',
-        name: 'Jane Smith',
-        platform: 'whatsapp'
-      },
-      messages: [
-        {
-          id: '2',
-          text: 'Hi! I need help with my order.',
-          sender: 'user',
-          timestamp: new Date().toISOString(),
-          type: 'whatsapp'
-        }
-      ],
-      unreadCount: 1,
-      status: 'active'
-    }
-  ],
+    messages: [{
+      id: '1',
+      text: 'Hello! How can I help you today?',
+      sender: 'agent',
+      timestamp: new Date().toISOString(),
+      type: 'agent'
+    }],
+    unreadCount: 0,
+    status: 'active'
+  }],
   activeChat: null,
   selectedMessages: [],
 
   setActiveChat: (chatId) => {
-    set((state) => {
-      if (chatId) {
-        // Mark chat as read when selected
-        const updatedChats = state.chats.map((chat) =>
-          chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
-        );
-        return { activeChat: chatId, chats: updatedChats };
-      }
-      return { activeChat: chatId };
-    });
+    set({ activeChat: chatId });
+    if (chatId) {
+      get().markAsRead(chatId);
+    }
   },
 
   sendMessage: (chatId, text) => {
@@ -145,34 +114,6 @@ export const useChatStore = create<ChatStore>((set) => ({
           ? {
               ...chat,
               unreadCount: 0,
-            }
-          : chat
-      ),
-    }));
-  },
-
-  addChat: (chat) => {
-    set((state) => ({
-      chats: [
-        ...state.chats,
-        {
-          ...chat,
-          id: crypto.randomUUID(),
-          messages: [],
-          unreadCount: 0,
-          status: 'active',
-        },
-      ],
-    }));
-  },
-
-  resolveChat: (chatId) => {
-    set((state) => ({
-      chats: state.chats.map((chat) =>
-        chat.id === chatId
-          ? {
-              ...chat,
-              status: 'resolved',
             }
           : chat
       ),

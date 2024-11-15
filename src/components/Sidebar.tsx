@@ -1,222 +1,50 @@
 import React from 'react';
-import { useAuthStore } from '../store/auth';
-import { Module } from '../types/rbac';
 import {
   LayoutDashboard,
-  Calendar,
-  ListTodo,
+  CheckSquare,
   Users,
-  MessageSquare,
+  Ticket,
   FileText,
+  MessageSquare,
   UserCog,
   DollarSign,
-  Megaphone,
-  Boxes,
+  Bell,
   Settings,
+  HelpCircle,
   ChevronDown,
   ChevronRight,
-  Zap
+  Megaphone,
+  Zap,
+  Calendar,
+  Ship,
+  Plane,
+  Package,
+  Truck,
+  Warehouse as WarehouseIcon,
+  ShoppingBag,
+  FileSpreadsheet,
+  Laptop,
+  RotateCcw,
+  Repeat,
+  Headphones,
+  Settings2,
+  Power,
+  ClipboardList,
 } from 'lucide-react';
 import clsx from 'clsx';
 
-interface SidebarProps {
-  activeSection: string;
-  onNavigate: (section: string) => void;
+interface SubItem {
+  id: string;
+  label: string;
 }
-
-export const Sidebar: React.FC<SidebarProps> = ({ activeSection, onNavigate }) => {
-  const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
-  const { hasPermission } = useAuthStore();
-
-  const toggleExpanded = (item: string) => {
-    setExpandedItems(prev =>
-      prev.includes(item) 
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
-    );
-  };
-
-  const isExpanded = (item: string) => expandedItems.includes(item);
-
-  const hasModuleAccess = (module: Module) => {
-    return hasPermission(module, 'view');
-  };
-
-  const hasSubModuleAccess = (module: Module, subModule: string) => {
-    return hasPermission(module, 'view') && hasPermission(subModule as Module, 'view');
-  };
-
-  return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col">
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-2">
-          <Zap className="h-6 w-6 text-primary" />
-          <span className="text-lg font-semibold">TradExx</span>
-        </div>
-      </div>
-
-      <div className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {hasModuleAccess('dashboard') && (
-          <NavItem
-            icon={LayoutDashboard}
-            label="Dashboard"
-            active={activeSection === 'dashboard'}
-            onClick={() => onNavigate('dashboard')}
-          />
-        )}
-
-        {hasModuleAccess('events') && (
-          <NavItem
-            icon={Calendar}
-            label="Events"
-            active={activeSection === 'events'}
-            onClick={() => onNavigate('events')}
-          />
-        )}
-
-        {hasModuleAccess('tasks') && (
-          <NavItem
-            icon={ListTodo}
-            label="Tasks"
-            active={activeSection === 'tasks'}
-            onClick={() => onNavigate('tasks')}
-          />
-        )}
-
-        {hasModuleAccess('contacts') && (
-          <NavItem
-            icon={Users}
-            label="Contacts"
-            active={activeSection === 'contacts'}
-            onClick={() => onNavigate('contacts')}
-          />
-        )}
-
-        {hasModuleAccess('tickets') && (
-          <NavItem
-            icon={MessageSquare}
-            label="Tickets"
-            active={activeSection === 'tickets'}
-            onClick={() => onNavigate('tickets')}
-          />
-        )}
-
-        {hasModuleAccess('documents') && (
-          <NavItem
-            icon={FileText}
-            label="Documents"
-            active={activeSection === 'documents'}
-            onClick={() => onNavigate('documents')}
-          />
-        )}
-
-        {hasModuleAccess('hr') && (
-          <NavItem
-            icon={UserCog}
-            label="HR"
-            active={activeSection.startsWith('hr/')}
-            expanded={isExpanded('hr')}
-            onClick={() => toggleExpanded('hr')}
-            subItems={[
-              { id: 'hr/recruitment', label: 'Recruitment' },
-              { id: 'hr/employees', label: 'Employees' },
-              { id: 'hr/performance', label: 'Performance' },
-              { id: 'hr/timesheet', label: 'Timesheet' },
-              { id: 'hr/payroll', label: 'Payroll' },
-              { id: 'hr/leave', label: 'Leave Management' },
-              { id: 'hr/compliance', label: 'Compliance' },
-            ].filter(item => hasSubModuleAccess('hr', item.id.split('/')[1]))}
-            onSubItemClick={onNavigate}
-            activeSubItem={activeSection}
-          />
-        )}
-
-        {hasModuleAccess('finance') && (
-          <NavItem
-            icon={DollarSign}
-            label="Finance"
-            active={activeSection.startsWith('finance/')}
-            expanded={isExpanded('finance')}
-            onClick={() => toggleExpanded('finance')}
-            subItems={[
-              { id: 'finance/dashboard', label: 'Overview' },
-              { id: 'finance/invoices', label: 'Invoices' },
-              { id: 'finance/expenses', label: 'Expenses' },
-              { id: 'finance/banking', label: 'Banking' },
-              { id: 'finance/reports', label: 'Reports' },
-              { id: 'finance/accounting', label: 'Accounting' },
-            ].filter(item => hasSubModuleAccess('finance', item.id.split('/')[1]))}
-            onSubItemClick={onNavigate}
-            activeSubItem={activeSection}
-          />
-        )}
-
-        {hasModuleAccess('marketing') && (
-          <NavItem
-            icon={Megaphone}
-            label="Marketing"
-            active={activeSection.startsWith('marketing/')}
-            expanded={isExpanded('marketing')}
-            onClick={() => toggleExpanded('marketing')}
-            subItems={[
-              { id: 'marketing/dashboard', label: 'Overview' },
-              { id: 'marketing/calendar', label: 'Content Calendar' },
-              { id: 'marketing/social', label: 'Social Media' },
-              { id: 'marketing/campaigns', label: 'Campaigns' },
-              { id: 'marketing/analytics', label: 'Analytics' },
-              { id: 'marketing/audience', label: 'Audience' },
-              { id: 'marketing/assets', label: 'Brand Assets' },
-              { id: 'marketing/automation', label: 'Automation' },
-            ].filter(item => hasSubModuleAccess('marketing', item.id.split('/')[1]))}
-            onSubItemClick={onNavigate}
-            activeSubItem={activeSection}
-          />
-        )}
-
-        {hasModuleAccess('services') && (
-          <NavItem
-            icon={Boxes}
-            label="Services"
-            active={activeSection.startsWith('services/')}
-            expanded={isExpanded('services')}
-            onClick={() => toggleExpanded('services')}
-            subItems={[
-              { id: 'services/warehouse', label: 'Warehouse' },
-              { id: 'services/ocean', label: 'Ocean Freight' },
-              { id: 'services/air', label: 'Air Freight' },
-              { id: 'services/courier', label: 'Courier' },
-              { id: 'services/land', label: 'Land Transport' },
-              { id: 'services/procurement', label: 'Procurement' },
-              { id: 'services/bureau', label: 'Bureau' },
-              { id: 'services/it', label: 'IT Services' },
-            ].filter(item => hasSubModuleAccess('services', item.id.split('/')[1]))}
-            onSubItemClick={onNavigate}
-            activeSubItem={activeSection}
-          />
-        )}
-      </div>
-
-      <div className="p-4 border-t border-border space-y-1">
-        {hasModuleAccess('settings') && (
-          <NavItem
-            icon={Settings}
-            label="Settings"
-            active={activeSection === 'settings'}
-            onClick={() => onNavigate('settings')}
-          />
-        )}
-      </div>
-    </aside>
-  );
-};
 
 interface NavItemProps {
   icon: React.ElementType;
   label: string;
-  active: boolean;
+  active?: boolean;
   expanded?: boolean;
-  onClick: () => void;
-  subItems?: Array<{ id: string; label: string }>;
+  onClick?: () => void;
+  subItems?: SubItem[];
   onSubItemClick?: (id: string) => void;
   activeSubItem?: string;
 }
@@ -232,36 +60,34 @@ const NavItem: React.FC<NavItemProps> = ({
   activeSubItem,
 }) => {
   return (
-    <div>
+    <div className="space-y-1">
       <button
         onClick={onClick}
         className={clsx(
-          'w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg',
-          active ? 'bg-primary/10 text-primary' : 'text-text hover:bg-gray-100'
+          'w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg',
+          active
+            ? 'bg-primary/10 text-primary'
+            : 'text-gray-700 hover:bg-gray-100'
         )}
       >
         <Icon className="h-5 w-5" />
         <span className="flex-1 text-left">{label}</span>
         {subItems && (
-          expanded ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronRight className="h-4 w-4" />
-          )
+          expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />
         )}
       </button>
 
-      {subItems && expanded && (
-        <div className="mt-1 ml-4 space-y-1">
+      {expanded && subItems && (
+        <div className="pl-10 space-y-1">
           {subItems.map((item) => (
             <button
               key={item.id}
               onClick={() => onSubItemClick?.(item.id)}
               className={clsx(
-                'w-full flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg',
+                'w-full text-left px-3 py-2 text-sm font-medium rounded-lg',
                 activeSubItem === item.id
                   ? 'bg-primary/10 text-primary'
-                  : 'text-text hover:bg-gray-100'
+                  : 'text-gray-700 hover:bg-gray-100'
               )}
             >
               {item.label}
@@ -270,5 +96,204 @@ const NavItem: React.FC<NavItemProps> = ({
         </div>
       )}
     </div>
+  );
+};
+
+interface SidebarProps {
+  activeSection: string;
+  onNavigate: (section: string) => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ activeSection, onNavigate }) => {
+  const [expandedItems, setExpandedItems] = React.useState<string[]>([]);
+
+  const toggleExpanded = (item: string) => {
+    setExpandedItems(prev =>
+      prev.includes(item) 
+        ? prev.filter(i => i !== item)
+        : [item] // Only keep the newly expanded item
+    );
+  };
+
+  const isExpanded = (item: string) => expandedItems.includes(item);
+
+  return (
+    <aside className="w-64 bg-card border-r border-border flex flex-col">
+      <div className="p-4 border-b border-border">
+        <div className="flex items-center gap-2">
+          <Zap className="h-6 w-6 text-primary" />
+          <span className="text-lg font-semibold">TradExx</span>
+        </div>
+      </div>
+
+      <div className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <NavItem
+          icon={LayoutDashboard}
+          label="Dashboard"
+          active={activeSection === 'dashboard'}
+          onClick={() => onNavigate('dashboard')}
+        />
+
+        <NavItem
+          icon={Calendar}
+          label="Events"
+          active={activeSection === 'events'}
+          onClick={() => onNavigate('events')}
+        />
+
+        <NavItem
+          icon={CheckSquare}
+          label="Tasks"
+          active={activeSection === 'tasks'}
+          onClick={() => onNavigate('tasks')}
+        />
+
+        <NavItem
+          icon={Users}
+          label="Contacts"
+          active={activeSection === 'contacts'}
+          onClick={() => onNavigate('contacts')}
+        />
+
+        <NavItem
+          icon={Ticket}
+          label="Tickets"
+          active={activeSection === 'tickets'}
+          onClick={() => onNavigate('tickets')}
+        />
+
+        <NavItem
+          icon={FileText}
+          label="Documents"
+          active={activeSection === 'documents'}
+          onClick={() => onNavigate('documents')}
+        />
+
+        <NavItem
+          icon={MessageSquare}
+          label="Chat"
+          active={activeSection === 'chat'}
+          onClick={() => onNavigate('chat')}
+        />
+
+        <NavItem
+          icon={UserCog}
+          label="HR"
+          active={activeSection.startsWith('hr/')}
+          expanded={isExpanded('hr')}
+          onClick={() => toggleExpanded('hr')}
+          subItems={[
+            { id: 'hr/recruitment', label: 'Recruitment' },
+            { id: 'hr/employees', label: 'Employees' },
+            { id: 'hr/performance', label: 'Performance' },
+            { id: 'hr/timesheet', label: 'Timesheet' },
+            { id: 'hr/payroll', label: 'Payroll' },
+            { id: 'hr/leave', label: 'Leave Management' },
+            { id: 'hr/compliance', label: 'Compliance' },
+          ]}
+          onSubItemClick={onNavigate}
+          activeSubItem={activeSection}
+        />
+
+        <NavItem
+          icon={DollarSign}
+          label="Finance"
+          active={activeSection.startsWith('finance/')}
+          expanded={isExpanded('finance')}
+          onClick={() => toggleExpanded('finance')}
+          subItems={[
+            { id: 'finance/dashboard', label: 'Dashboard' },
+            { id: 'finance/invoices', label: 'Invoices' },
+            { id: 'finance/expenses', label: 'Expenses' },
+            { id: 'finance/banking', label: 'Banking' },
+            { id: 'finance/reports', label: 'Reports' },
+            { id: 'finance/accounting', label: 'Accounting' },
+          ]}
+          onSubItemClick={onNavigate}
+          activeSubItem={activeSection}
+        />
+
+        <NavItem
+          icon={Megaphone}
+          label="Marketing"
+          active={activeSection.startsWith('marketing/')}
+          expanded={isExpanded('marketing')}
+          onClick={() => toggleExpanded('marketing')}
+          subItems={[
+            { id: 'marketing/dashboard', label: 'Dashboard' },
+            { id: 'marketing/calendar', label: 'Content Calendar' },
+            { id: 'marketing/social', label: 'Social Media' },
+            { id: 'marketing/campaigns', label: 'Campaigns' },
+            { id: 'marketing/analytics', label: 'Analytics' },
+            { id: 'marketing/audience', label: 'Audience' },
+            { id: 'marketing/assets', label: 'Brand Assets' },
+            { id: 'marketing/automation', label: 'Automation' },
+          ]}
+          onSubItemClick={onNavigate}
+          activeSubItem={activeSection}
+        />
+
+        <NavItem
+          icon={Ship}
+          label="Services"
+          active={activeSection.startsWith('services/')}
+          expanded={isExpanded('services')}
+          onClick={() => toggleExpanded('services')}
+          subItems={[
+            { id: 'services/ocean', label: 'Ocean Freight' },
+            { id: 'services/air', label: 'Air Freight' },
+            { id: 'services/courier', label: 'Courier Services' },
+            { id: 'services/land', label: 'Land Freight' },
+            { id: 'services/warehouse', label: 'Warehouse' },
+            { id: 'services/procurement', label: 'Procurement' },
+            { id: 'services/bureau', label: 'Bureau Services' },
+            { id: 'services/it', label: 'IT Support' },
+          ]}
+          onSubItemClick={onNavigate}
+          activeSubItem={activeSection}
+        />
+
+        <NavItem
+          icon={RotateCcw}
+          label="Account Recovery"
+          active={activeSection.startsWith('recovery/')}
+          expanded={isExpanded('recovery')}
+          onClick={() => toggleExpanded('recovery')}
+          subItems={[
+            { id: 'recovery/collection', label: 'Collection' },
+            { id: 'recovery/renewal', label: 'Renewal & Retention' },
+            { id: 'recovery/support', label: 'Dedicated Support' },
+            { id: 'recovery/optimization', label: 'Service Optimization' },
+            { id: 'recovery/reactivation', label: 'Reactivation Programs' },
+            { id: 'recovery/survey', label: 'Survey & Follow-Up' },
+          ]}
+          onSubItemClick={onNavigate}
+          activeSubItem={activeSection}
+        />
+      </div>
+
+      <div className="p-4 border-t border-border space-y-1">
+        <NavItem
+          icon={Bell}
+          label="Notifications"
+          active={activeSection === 'notifications'}
+          onClick={() => onNavigate('notifications')}
+        />
+
+        <NavItem
+          icon={Settings}
+          label="Settings"
+          active={activeSection === 'settings'}
+          onClick={() => onNavigate('settings')}
+        />
+
+        <NavItem
+          icon={HelpCircle}
+          label="Help & Support"
+          active={activeSection === 'help'}
+          onClick={() => onNavigate('help')}
+        />
+      </div>
+    </aside>
   );
 };
